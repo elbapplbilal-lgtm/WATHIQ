@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#091525">
+  <title>وثيق WATHIQ — إثبات وجود الملفات على Ethereum</title>
+  <style>
+    :root {color-scheme:dark;--bg:#07101c;--panel:#102238;--border:#243950;--accent:#54b9ff;--txt:#edf4ff;--sub:#a9bfd5;--good:#5adcac;--bad:#ff9ba4}
+    *{box-sizing:border-box}body{background:radial-gradient(ellipse at 20% -10%,#193b60 0,transparent 55%),var(--bg);color:var(--txt);font-family:system-ui,'Noto Sans Arabic',sans-serif;margin:0;min-height:100vh}
+    main{max-width:680px;margin:auto;padding:19px 15px 50px}header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:22px}header strong{font-size:23px;letter-spacing:1px}header strong span{color:var(--accent)}
+    .tag{background:#203952;border:1px solid #32547a;border-radius:18px;color:#bde4ff;padding:6px 10px;font-size:12px}
+    h1{font-size:25px;line-height:1.5;margin:0 0 8px}h2{font-size:17px;margin:0 0 12px}p{font-size:14px;color:var(--sub);line-height:1.85;margin:0 0 15px}
+    .box{border:1px solid var(--border);background:rgba(16,34,56,.94);border-radius:17px;padding:17px;margin:15px 0;box-shadow:0 5px 22px #0002}
+    .muted{color:var(--sub);font-size:12px;line-height:1.8}.hint{padding:10px 12px;background:#182e43;border-radius:9px;border-right:3px solid var(--accent);margin-top:10px;font-size:12px;color:#b9d3e9;line-height:1.8}
+    label{display:block;font-size:13px;margin-bottom:7px;font-weight:650}input[type=file],input[type=text]{width:100%;min-height:43px;border:1px solid #35526d;border-radius:10px;background:#0b1726;color:#fff;padding:10px;font-size:13px;outline:0}
+    input[type=file]{font-size:12px}input:focus{border-color:var(--accent)}button{min-height:45px;border:none;border-radius:10px;padding:9px 13px;background:linear-gradient(105deg,#2479d7,#38aeed);color:#fff;font-size:14px;font-weight:750;cursor:pointer;width:100%;margin-top:11px}button.secondary{background:#233a54;border:1px solid #355775}button:disabled{opacity:.55;cursor:not-allowed}
+    .value{direction:ltr;text-align:left;overflow-wrap:anywhere;background:#091726;padding:13px;border-radius:10px;border:1px solid #214363;font:12px/1.9 ui-monospace,monospace;user-select:all;min-height:45px}
+    .result{border:1px solid #345474;background:#11263e;padding:12px;border-radius:10px;font-size:13px;line-height:1.8;overflow-wrap:anywhere;min-height:44px;margin-top:10px}
+    .result.good{border-color:#246958;color:var(--good)}.result.bad{border-color:#88404f;color:var(--bad)}a{color:#9bd8ff;overflow-wrap:anywhere}small{display:block;margin-top:8px;color:var(--sub)}.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}.subtle{font-size:12px;color:#a3bfda}.step{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:100%;background:#214a6c;color:#c4e6ff;margin-left:6px;font-size:12px}
+    footer{font-size:12px;color:#92acc7;line-height:2;margin-top:26px}
+    @media(max-width:450px){.two{grid-template-columns:1fr}h1{font-size:21px}}
+  </style>
+</head>
+<body><main>
+  <header><strong>🔐 <span>WATHIQ</span> | وثيق</strong><span class="tag">Ethereum · Sepolia</span></header>
+  <h1>سجّل بصمة ملفك على البلوكتشين</h1>
+  <p>دليل تقني على وجود ملف فواحد الوقت. كنحسبو البصمة فوق جهازك؛ الملف نفسه ما كنرفعوهش وما كيتخزنش على Ethereum.</p>
+  <section class="box">
+    <h2><span class="step">1</span> اختار الملف</h2>
+    <label for="file">الملف الأصلي</label>
+    <input id="file" type="file">
+    <small>الحد فهاد النسخة: 20 MB. خاص الملف يبقى عندك باش تقدر تتحقق منو من بعد.</small>
+    <button id="hashButton">حساب البصمة SHA-256</button>
+    <div id="hashResult" class="result" aria-live="polite">ما تحسبات حتى بصمة دابا.</div>
+    <div id="hashValue" class="value" style="display:none" dir="ltr"></div>
+    <button id="copyButton" class="secondary" style="display:none">نسخ بصمة الملف</button>
+    <div class="hint">تنبيه: البصمة ما كتثبتش أنك المؤلف الأصلي، وملف صغير معروف يمكن للغير يحسب نفس البصمة ديالو.</div>
+  </section>
+  <section class="box">
+    <h2><span class="step">2</span> عقد وثيق على Sepolia</h2>
+    <p>خاص عنوان عقد WathiqProof المنشور على Sepolia. حتى ننشروه، تقدر تجرب المرحلة الأولى بلا محفظة.</p>
+    <label for="contract">عنوان العقد المنشور (0x...)</label>
+    <input id="contract" type="text" inputmode="text" autocomplete="off" spellcheck="false" placeholder="0x... (كنضيفوه من بعد النشر)">
+    <button id="connectButton" class="secondary">ربط محفظة Ethereum</button>
+    <div id="walletStatus" class="result" aria-live="polite">المحفظة ما مربوطةش.</div>
+    <button id="registerButton" disabled>تسجيل البصمة على Sepolia</button>
+    <div id="registerResult" class="result" aria-live="polite">التسجيل كيحتاج محفظة، العقد المنشور، وSepolia ETH تجريبي.</div>
+    <div class="hint">كل تسجيل كيتطلب موافقة المحفظة ورسوم غاز تجريبية على Sepolia. ما تخلص حتى واحد مقابل مفاتيح المحفظة، وما تشاركش عبارة الاسترجاع.</div>
+  </section>
+  <section class="box">
+    <h2><span class="step">3</span> تحقق من بصمة مسجلة</h2>
+    <p>حسب نفس بصمة الملف فالقسم الأول، ودخل عنوان المحفظة اللي سجلتو. باش نقراو العقد خاص مزود Ethereum على Sepolia.</p>
+    <label for="verifyWallet">عنوان المحفظة اللي سجلت البصمة</label>
+    <input id="verifyWallet" type="text" inputmode="text" spellcheck="false" autocomplete="off" placeholder="0x...">
+    <button id="verifyButton" class="secondary">تحقق من التسجيل على الشبكة</button>
+    <div id="verifyResult" class="result" aria-live="polite">ما تدار حتى تحقق دابا.</div>
+  </section>
+  <footer>وثيق — نموذج أولي مفتوح للتطوير. البلوكتشين كتسجل وقت تأكيد الكتلة تقريباً، ماشي شهادة ملكية فكرية أو ضمان لصحة الملف. لا تنشر الملفات الحساسة ولا مفاتيح المحفظة.</footer>
+</main>
+<script src="utils.js"></script>
+<script>
+(function(){
+  'use strict';
+  const $ = (id) => document.getElementById(id);
+  const u = globalThis.Wathiq;
+  const SEPOLIA_CHAIN = '0xaa36a7';
+  const MAX_BYTES = 20 * 1024 * 1024;
+  let currentHash = null;
+  let currentAccount = null;
+  let chainId = null;
+  function show(id, msg, style) { const el = $(id); el.className = 'result'+(style?' '+style:''); el.textContent = msg; }
+  function contractAddress() { return u.addressHex($('contract').value.trim()); }
+  function provider() {
+    if (!globalThis.ethereum || typeof globalThis.ethereum.request !== 'function') {
+      throw new Error('ما لقيتش محفظة داخل المتصفح. افتح الموقع من متصفح DApp لمحفظة كتدعم Ethereum.');
+    }
+    return globalThis.ethereum;
+  }
+  function ready() {
+    let validContract = false;
+    try { u.addressHex($('contract').value.trim()); validContract = true; } catch (_) {}
+    $('registerButton').disabled = !(currentHash && currentAccount && chainId === SEPOLIA_CHAIN && validContract);
+  }
+  $('contract').addEventListener('input',ready);
+  $('file').addEventListener('change', () => {currentHash=null;$('hashValue').style.display='none';$('copyButton').style.display='none';show('hashResult','اختار «حساب البصمة» باش تبدا.');ready();});
+  $('hashButton').addEventListener('click',async () => {
+    const file = $('file').files[0];
+    if (!file) return show('hashResult','اختار ملف أولاً.','bad');
+    if (file.size > MAX_BYTES) return show('hashResult','الملف أكبر من 20 MB؛ جرّب ملف أصغر فهاد النسخة.','bad');
+    $('hashButton').disabled=true;show('hashResult','جاري حساب البصمة فوق جهازك...');
+    try {
+      currentHash=await u.hashFile(file);
+      show('hashResult','تم حساب بصمة '+file.name+' محلياً. ما تصيفط حتى ملف لأي خادم.','good');
+      $('hashValue').style.display='block';$('hashValue').textContent=currentHash;
+      $('copyButton').style.display='block';
+    } catch(e){currentHash=null;show('hashResult',e.message,'bad')}
+    finally{$('hashButton').disabled=false;ready()}
+  });
+  $('copyButton').addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText(currentHash);show('hashResult','تنسخات بصمة الملف.','good') }
+    catch(e){show('hashResult','نسخ البصمة ما متاحش هنا. تقدر تحددها يدوياً من المربع.','bad')}
+  });
+  $('connectButton').addEventListener('click',async () => {
+    try {
+      const p=provider();
+      const accounts=await p.request({method:'eth_requestAccounts'});
+      if(!Array.isArray(accounts)||!accounts.length) throw new Error('المحفظة ما عطتنا حتى عنوان.');
+      currentAccount=u.addressHex(accounts[0]);
+      chainId=String(await p.request({method:'eth_chainId'})).toLowerCase();
+      $('verifyWallet').value=currentAccount;
+      if(chainId!==SEPOLIA_CHAIN) {
+        show('walletStatus','تربطات المحفظة، ولكن خاصك تختار شبكة Sepolia من داخل المحفظة.','bad');
+      } else {
+        show('walletStatus','المحفظة: '+currentAccount+' — شبكة Sepolia ✅','good');
+      }
+      if(typeof p.on==='function'){
+        p.on('accountsChanged',accounts=>{currentAccount=accounts?.length?accounts[0]:null;show('walletStatus','تبدّل حساب المحفظة. عاود الربط باش نتأكدو من العنوان.');currentAccount=null;ready();});
+        p.on('chainChanged',()=>{chainId=null;currentAccount=null;show('walletStatus','تبدلات الشبكة. عاود ربط المحفظة.');ready();});
+      }
+    } catch(e){show('walletStatus',e.message || 'تعذّر ربط المحفظة.','bad')}
+    ready();
+  });
+  function txLink(tx) {
+    if (typeof tx !== 'string' || !/^0x[a-fA-F0-9]{64}$/.test(tx)) return;
+    const a=document.createElement('a');
+    a.href='https://sepolia.etherscan.io/tx/'+tx;
+    a.target='_blank'; a.rel='noopener noreferrer';
+    a.textContent='تتبع المعاملة على Etherscan';
+    $('registerResult').append(document.createElement('div'),a);
+  }
+  async function confirmTransaction(p, tx) {
+    // Pending is not success: wait for the receipt and check the execution status.
+    for (let i=0;i<24;i++) {
+      await new Promise(resolve=>setTimeout(resolve,5000));
+      const receipt=await p.request({method:'eth_getTransactionReceipt',params:[tx]});
+      if (!receipt) continue;
+      if (receipt.status === '0x1') return true;
+      if (receipt.status === '0x0') return false;
+      throw new Error('حالة المعاملة غير معروفة. راجع Etherscan.');
+    }
+    return null;
+  }
+  $('registerButton').addEventListener('click',async () => {
+    $('registerButton').disabled=true;
+    let tx=null;
+    try {
+      const p=provider(); const address=contractAddress();
+      if(!currentHash||!currentAccount) throw new Error('حسب البصمة وربط المحفظة أولاً.');
+      const [liveChain,accounts]=await Promise.all([
+        p.request({method:'eth_chainId'}),
+        p.request({method:'eth_accounts'})
+      ]);
+      if(String(liveChain).toLowerCase()!==SEPOLIA_CHAIN) throw new Error('اختار Sepolia أولاً.');
+      if (!Array.isArray(accounts)||!accounts.some(x=>x.toLowerCase()===currentAccount))
+        throw new Error('تبدل الحساب: عاود ربط المحفظة.');
+      const code=await p.request({method:'eth_getCode',params:[address,'latest']});
+      if(typeof code!=='string'||code==='0x'||code==='0x0') throw new Error('هاد العنوان ما فيه حتى عقد ذكي على Sepolia.');
+      show('registerResult','راجع العقد والغاز فالمحفظة قبل الموافقة. الإرسال ماشي هو التأكيد.');
+      tx=await p.request({method:'eth_sendTransaction',params:[{from:currentAccount,to:address,data:u.encodeRecord(currentHash)}]});
+      show('registerResult','تْرسلات المعاملة؛ كنستناو تأكيدها داخل الشبكة...');
+      txLink(tx);
+      const mined=await confirmTransaction(p,tx);
+      if(mined===true) show('registerResult','تأكدات المعاملة بنجاح على Sepolia ✅','good');
+      else if(mined===false) show('registerResult','المعاملة تأكدات ولكن التنفيذ فشل. ما تسجلاتش البصمة.','bad');
+      else show('registerResult','المعاملة مازال ما تأكداتش بعد دقيقتين. شوف Etherscan باش تعرف حالتها.');
+      txLink(tx);
+    } catch(e){show('registerResult',e.message||'تعذّر إرسال المعاملة أو التأكد منها.','bad');txLink(tx)}
+    finally {ready()}
+  });
+  $('verifyButton').addEventListener('click',async () => {
+    try {
+      if(!currentHash) throw new Error('حسب بصمة الملف أولاً.');
+      const contract=contractAddress();const wallet=u.addressHex($('verifyWallet').value.trim());
+      const p=provider();const liveChain=String(await p.request({method:'eth_chainId'})).toLowerCase();
+      if(liveChain!==SEPOLIA_CHAIN) throw new Error('خاص الشبكة تكون Sepolia.');
+      const code=await p.request({method:'eth_getCode',params:[contract,'latest']});
+      if(typeof code!=='string'||code==='0x'||code==='0x0') throw new Error('هاد العنوان ما فيه حتى عقد ذكي على Sepolia.');
+      show('verifyResult','جاري الاستعلام من عقد وثيق...');
+      const result=await p.request({method:'eth_call',params:[{to:contract,data:u.encodeGetTimestamp(wallet,currentHash)},'latest']});
+      const ts=u.decodeTimestamp(result);
+      if(ts===0n) show('verifyResult','ما لقيناش هاد البصمة مسجلة تحت هاد عنوان المحفظة.','bad');
+      else show('verifyResult','لقينا التسجيل ✅ وقت الكتلة: '+new Date(Number(ts)*1000).toLocaleString('ar-MA')+' — محفظة: '+wallet,'good');
+    }catch(e){show('verifyResult',e.message||'تعذّر التحقق.','bad')}
+  });
+  ready();
+})();
+</script>
+</body>
+</html>
