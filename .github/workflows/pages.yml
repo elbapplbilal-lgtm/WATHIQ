@@ -1,0 +1,47 @@
+name: Deploy WATHIQ to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'index.html'
+      - 'utils.js'
+      - '.github/workflows/pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Build static website
+        run: |
+          mkdir -p _site
+          cp index.html utils.js _site/
+          touch _site/.nojekyll
+
+      - name: Upload website
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - name: Publish website
+        id: deployment
+        uses: actions/deploy-pages@v4
