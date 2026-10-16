@@ -1,0 +1,21 @@
+name: WATHIQ checks
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: JavaScript unit tests
+        run: node --test tests/utils.test.cjs
+      - name: Install Solidity compiler
+        run: npm install --no-save solc@0.8.24
+      - name: Compile contract
+        run: npx solcjs --bin --abi -o /tmp/wathiq-build contracts/WathiqProof.sol
